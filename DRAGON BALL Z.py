@@ -1,5 +1,6 @@
 import pygame
 from sys import exit
+import random
 
 
 def display_score():
@@ -22,15 +23,17 @@ def restart():
     screen.blit(restart_rend, restart_rect)
 
 
-
-
 def start():
     plain_surface.fill('blue')
+
+
 def game_name():
     game_name = pygame.font.Font(None, 50)
     game_name_rend = game_name.render('DRAGON BALL Z', False, 'yellow')
     game_name_rect = game_name_rend.get_rect(center=(355, 150))
     screen.blit(game_name_rend, game_name_rect)
+
+
 def start_command():
     start_command = pygame.font.Font(None, 50)
     start_command_rend = start_command.render('PRESS \'SPACE\' TO START', False, 'yellow')
@@ -54,6 +57,21 @@ goku_black = pygame.image.load('pygame/goku black.png').convert_alpha()
 kid_buu = pygame.image.load('pygame/kid buu.png').convert_alpha()
 boss = pygame.image.load('pygame/boss.png').convert_alpha()
 
+
+# random moves
+moves_lst_frieza = [1900, 3000, 2500, 1500]
+moves_lst_buu = [4000, 4800, 5500, 7000]
+moves_lst_goku_black = [9000, 20000, 10000]
+moves_lst_dragon_ball = [6000, 7000, 4000, 5500]
+
+# health bar
+heart_1 = pygame.image.load('pygame/hearts.png')
+heart_2 = pygame.image.load('pygame/hearts.png')
+heart_3 = pygame.image.load('pygame/hearts.png')
+heart_1_rect = heart_1.get_rect(center=(20, 30))
+heart_2_rect = heart_2.get_rect(center=(30, 30))
+heart_3_rect = heart_3.get_rect(center=(40, 30))
+
 font = pygame.font.Font(None, 30)
 pygame.mixer.init()
 pygame.mixer.music.load("game music.mp3")
@@ -73,7 +91,9 @@ score = 0
 real_score = 0
 game_active = True
 real_score_1 = 0
-check_lst = '1'
+hearts = 0
+hearts_count = 0
+real_hearts = 0
 
 while True:
     for event in pygame.event.get():
@@ -100,49 +120,79 @@ while True:
             screen.fill('black')
             display_score_1()
             restart()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r:
-                    frieza_rect.left = 2200
-                    kid_buu_rect.left = 6000
-                    goku_black_rect.left = 25000
-                    dragon_ball_rect.left = 8000
-                    boss_rect.left = 70000
-                    goku_rect.left = 130
-                    real_score_1 = 0
-                    game_active = True
+            pygame.mixer.music.stop()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                frieza_rect.left = 2200
+                kid_buu_rect.left = 6000
+                goku_black_rect.left = 25000
+                dragon_ball_rect.left = 8000
+                boss_rect.left = 70000
+                goku_rect.left = 130
+                real_score_1 = 0
+                game_active = True
+                pygame.mixer.music.play()
+                hearts = 3
     if game_active:
+        frieza_random = random.choice(moves_lst_frieza)
+        buu_random = random.choice(moves_lst_buu)
+        goku_black_random = random.choice(moves_lst_dragon_ball)
+        dragon_ball_random = random.choice(moves_lst_dragon_ball)
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.rewind()
         frieza_rect.left -= 9
         if frieza_rect.right <= 0:
-            frieza_rect.left = 2200
+            frieza_rect.left = frieza_random
 
         dragon_ball_rect.left -= 9
         if dragon_ball_rect.right <= 0:
-            dragon_ball_rect.left = 8000
+            dragon_ball_rect.left = dragon_ball_random
 
         goku_black_rect.left -= 10
         if goku_black_rect.right <= 0:
-            goku_black_rect.left = 25000
+            goku_black_rect.left = goku_back_random
 
         kid_buu_rect.left -= 9
         if kid_buu_rect.right <= 0:
-            kid_buu_rect.left = 6000
+            kid_buu_rect.left = buu_random
 
         boss_rect.left -= 10
         if boss_rect.right <= -100:
             boss_rect.left = 60000
 
         if frieza_rect.colliderect(goku_rect):
-            game_active = False
+            hearts_count += 1
+            real_hearts = hearts_count - (hearts_count - 1)
+            frieza_rect.left = frieza_random
+            if not frieza_rect.colliderect(goku_rect):
+                hearts += real_hearts
+                hearts_count = 0
+                real_hearts = 0
+
         if goku_black_rect.colliderect(goku_rect):
-            game_active = False
+            hearts_count += 1
+            real_hearts = hearts_count - (hearts_count - 1)
+            goku_black_rect.left = goku_black_random
+            if not goku_black_rect.colliderect(goku_rect):
+                hearts += real_hearts
+                hearts_count = 0
+                real_hearts = 0
+
         if kid_buu_rect.colliderect(goku_rect):
-            game_active = False
+            hearts_count += 1
+            real_hearts = hearts_count - (hearts_count - 1)
+            kid_buu_rect.left = buu_random
+            if not kid_buu_rect.colliderect(goku_rect):
+                hearts += real_hearts
+                hearts_count = 0
+                real_hearts = 0
+
         if boss_rect.colliderect(goku_rect):
             game_active = False
+
         if goku_rect.colliderect(dragon_ball_rect):
             score += 1
             real_score = score - (score - 1)
-            dragon_ball_rect.left = 12000
+            dragon_ball_rect.left = dragon_ball_random
         if not goku_rect.colliderect(dragon_ball_rect):
             real_score_1 += real_score
             real_score = 0
@@ -156,6 +206,19 @@ while True:
         screen.blit(goku_black, goku_black_rect)
         screen.blit(kid_buu, kid_buu_rect)
         screen.blit(boss, boss_rect)
+
+    match hearts:
+        case 0:
+            screen.blit(heart_3, heart_3_rect)
+            screen.blit(heart_2, heart_2_rect)
+            screen.blit(heart_1, heart_1_rect)
+        case 1:
+            screen.blit(heart_2, heart_2_rect)
+            screen.blit(heart_1, heart_1_rect)
+        case 2:
+            screen.blit(heart_1, heart_1_rect)
+        case 3:
+            game_active = False
 
     display_score()
     gravity += 1
