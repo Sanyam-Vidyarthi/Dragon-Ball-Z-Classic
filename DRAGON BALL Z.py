@@ -23,22 +23,22 @@ def restart():
     screen.blit(restart_rend, restart_rect)
 
 
-def start():
-    plain_surface.fill('blue')
-
-
 def game_name():
-    game_name = pygame.font.Font(None, 50)
-    game_name_rend = game_name.render('DRAGON BALL Z', False, 'yellow')
+    game_name_1 = pygame.font.Font(None, 50)
+    game_name_rend = game_name_1.render('DRAGON BALL Z', False, 'yellow')
     game_name_rect = game_name_rend.get_rect(center=(355, 150))
     screen.blit(game_name_rend, game_name_rect)
 
 
 def start_command():
-    start_command = pygame.font.Font(None, 50)
-    start_command_rend = start_command.render('PRESS \'SPACE\' TO START', False, 'yellow')
+    start_command_1 = pygame.font.Font(None, 50)
+    start_command_rend = start_command_1.render('PRESS \'SPACE\' TO START', False, 'yellow')
     start_command_rect = start_command_rend.get_rect(center=(355, 450))
     screen.blit(start_command_rend, start_command_rect)
+
+def start():
+    screen.fill('blue')
+
 
 
 pygame.init()
@@ -47,22 +47,21 @@ screen = pygame.display.set_mode((1070, 600),
 pygame.display.set_caption('DRAGON BALL Z')
 clock = pygame.time.Clock()
 
-plain_surface = pygame.image.load('pygame/terrain (Custom) .jpg').convert()
 text = pygame.image.load('pygame/dragon ball text.png').convert()
 goku = pygame.image.load('pygame/goku.png').convert_alpha()
 frieza = pygame.image.load('pygame/frieza1.png').convert_alpha()
-dragon_ball = pygame.image.load('pygame/dragon ball.png').convert_alpha()
 goku_2 = pygame.image.load('pygame/goku2.png').convert_alpha()
 goku_black = pygame.image.load('pygame/goku black.png').convert_alpha()
 kid_buu = pygame.image.load('pygame/kid buu.png').convert_alpha()
 boss = pygame.image.load('pygame/boss.png').convert_alpha()
+game_poster = pygame.image.load('pygame/game poster.jpg').convert_alpha()
 
 
 # random moves
-moves_lst_frieza = [1900, 3000, 2500, 1500]
+moves_lst_frieza = [2000, 3000, 1800, 2400]
 moves_lst_buu = [4000, 4800, 5500, 7000]
 moves_lst_goku_black = [9000, 20000, 10000]
-moves_lst_dragon_ball = [6000, 7000, 4000, 5500]
+moves_lst_dragon_ball = [1100, 1800, 2500, 1900]
 
 # health bar
 heart_1 = pygame.image.load('pygame/hearts.png')
@@ -72,28 +71,44 @@ heart_1_rect = heart_1.get_rect(center=(20, 30))
 heart_2_rect = heart_2.get_rect(center=(30, 30))
 heart_3_rect = heart_3.get_rect(center=(40, 30))
 
+# maps
+planet_namek = pygame.image.load('pygame/planet namek.png').convert()
+planet_kai = pygame.image.load('pygame/kai planet.png').convert()
+future_trunks_city = pygame.image.load('pygame/future trunks city.png').convert()
+
+
+# dragon balls
+dragon_ball = pygame.image.load('pygame/dragon ball.png').convert_alpha()
+dragon_ball_rect = dragon_ball.get_rect(midbottom=(1100, 200))
+namekian_dragon_ball = pygame.image.load('pygame/namekian dragon ball.png').convert_alpha()
+namekian_dragon_ball_rect = namekian_dragon_ball.get_rect(midbottom=(1100, 200))
+
+
 font = pygame.font.Font(None, 30)
 pygame.mixer.init()
 pygame.mixer.music.load("game music.mp3")
-pygame.mixer.music.set_volume(9)
+pygame.mixer.music.set_volume(15)
 pygame.mixer.music.play()
 
+# rect
 goku_rect = goku.get_rect(midbottom=(130, 430))
 frieza_rect = frieza.get_rect(midbottom=(1100, 435))
 goku_2_rect = goku_2.get_rect()
-dragon_ball_rect = dragon_ball.get_rect(midbottom=(1100, 200))
 goku_black_rect = goku_black.get_rect(midbottom=(8000, 435))
 kid_buu_rect = kid_buu.get_rect(midbottom=(5000, 438))
 boss_rect = boss.get_rect(midbottom=(100000, 550))
 
+# values
 gravity = 0
 score = 0
 real_score = 0
 game_active = True
 real_score_1 = 0
-hearts = 0
+hearts = 3
 hearts_count = 0
 real_hearts = 0
+map_count = 0
+start = True
 
 while True:
     for event in pygame.event.get():
@@ -116,6 +131,7 @@ while True:
                 if goku_rect.bottom >= 430:
                     gravity = -25
 
+        # game stop
         if not game_active:
             screen.fill('black')
             display_score_1()
@@ -132,93 +148,112 @@ while True:
                 game_active = True
                 pygame.mixer.music.play()
                 hearts = 3
+    # game activation
     if game_active:
         frieza_random = random.choice(moves_lst_frieza)
         buu_random = random.choice(moves_lst_buu)
         goku_black_random = random.choice(moves_lst_dragon_ball)
         dragon_ball_random = random.choice(moves_lst_dragon_ball)
+
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.rewind()
+
+        if real_score_1 == 11:
+            map_count = 1
+        elif real_score_1 == 21:
+            map_count = 2
+        elif real_score_1 == 31:
+            map_count = 3
+        elif real_score_1 == 41:
+            map_count = 4
+        elif real_score_1 == 51:
+            map_count = 5
+
+        # villains movement
+
         frieza_rect.left -= 9
         if frieza_rect.right <= 0:
             frieza_rect.left = frieza_random
 
-        dragon_ball_rect.left -= 9
-        if dragon_ball_rect.right <= 0:
-            dragon_ball_rect.left = dragon_ball_random
-
-        goku_black_rect.left -= 10
-        if goku_black_rect.right <= 0:
-            goku_black_rect.left = goku_back_random
-
-        kid_buu_rect.left -= 9
-        if kid_buu_rect.right <= 0:
-            kid_buu_rect.left = buu_random
-
-        boss_rect.left -= 10
-        if boss_rect.right <= -100:
-            boss_rect.left = 60000
-
-        if frieza_rect.colliderect(goku_rect):
-            hearts_count += 1
-            real_hearts = hearts_count - (hearts_count - 1)
+        if goku_rect.colliderect(frieza_rect):
+            hearts_count = 1
             frieza_rect.left = frieza_random
-            if not frieza_rect.colliderect(goku_rect):
-                hearts += real_hearts
+            if not goku_rect.colliderect(frieza_rect):
+                hearts -= hearts_count
                 hearts_count = 0
-                real_hearts = 0
 
         if goku_black_rect.colliderect(goku_rect):
-            hearts_count += 1
-            real_hearts = hearts_count - (hearts_count - 1)
+            hearts_count = 1
             goku_black_rect.left = goku_black_random
             if not goku_black_rect.colliderect(goku_rect):
-                hearts += real_hearts
+                hearts -= hearts_count
                 hearts_count = 0
-                real_hearts = 0
 
         if kid_buu_rect.colliderect(goku_rect):
-            hearts_count += 1
-            real_hearts = hearts_count - (hearts_count - 1)
+            hearts_count = 1
             kid_buu_rect.left = buu_random
             if not kid_buu_rect.colliderect(goku_rect):
-                hearts += real_hearts
+                hearts -= hearts_count
                 hearts_count = 0
-                real_hearts = 0
 
         if boss_rect.colliderect(goku_rect):
             game_active = False
 
+        # dragon balls movement
         if goku_rect.colliderect(dragon_ball_rect):
-            score += 1
-            real_score = score - (score - 1)
+            score = 1
             dragon_ball_rect.left = dragon_ball_random
-        if not goku_rect.colliderect(dragon_ball_rect):
-            real_score_1 += real_score
-            real_score = 0
-            score = 0
+            if not goku_rect.colliderect(dragon_ball_rect):
+                real_score_1 += score
+                score = 0
 
-        screen.blit(plain_surface, (0, 0))
-        screen.blit(text, (450, 30))
+        if goku_rect.colliderect(namekian_dragon_ball_rect):
+            score = 1
+            dragon_ball_rect.left = dragon_ball_random
+            if not goku_rect.colliderect(namekian_dragon_ball_rect):
+                real_score_1 += score
+                score = 0
+
+        screen.blit(planet_namek, (0, 0))
         screen.blit(goku, goku_rect)
         screen.blit(frieza, frieza_rect)
-        screen.blit(dragon_ball, dragon_ball_rect)
-        screen.blit(goku_black, goku_black_rect)
-        screen.blit(kid_buu, kid_buu_rect)
-        screen.blit(boss, boss_rect)
+        screen.blit(text, (455, 40))
+        
+        if map_count == 0:
+            screen.blit(dragon_ball, dragon_ball_rect)
+            dragon_ball_rect.left -= 9
+            if dragon_ball_rect.right <= 0:
+                dragon_ball_rect.left = dragon_ball_random                
+        elif map_count == 1:
+            screen.blit(go)
+            screen.blit(planet_kai, (0, 0))
+            screen.blit(kid_buu, kid_buu_rect)
+            screen.blit(namekian_dragon_ball, namekian_dragon_ball_rect)
+            namekian_dragon_ball_rect.left -= 9
+            if namekian_dragon_ball_rect.right <= 0:
+                namekian_dragon_ball_rect.left = dragon_ball_random
+            kid_buu_rect.left -= 9
+            if kid_buu_rect.right <= 0:
+                kid_buu_rect.left = buu_random
+        elif map_count == 2:
+            screen.blit(future_trunks_city, (0, 0))
+            screen.blit(goku_black, goku_black_rect)
+            goku_black_rect.left -= 9
+            if goku_black_rect.right <= 0:
+                goku_black_rect.left = goku_black_random
 
-    match hearts:
-        case 0:
-            screen.blit(heart_3, heart_3_rect)
-            screen.blit(heart_2, heart_2_rect)
-            screen.blit(heart_1, heart_1_rect)
-        case 1:
-            screen.blit(heart_2, heart_2_rect)
-            screen.blit(heart_1, heart_1_rect)
-        case 2:
-            screen.blit(heart_1, heart_1_rect)
-        case 3:
-            game_active = False
+        match hearts:
+            case 3:
+                screen.blit(heart_3, heart_3_rect)
+                screen.blit(heart_2, heart_2_rect)
+                screen.blit(heart_1, heart_1_rect)
+            case 2:
+                screen.blit(heart_2, heart_2_rect)
+                screen.blit(heart_1, heart_1_rect)
+            case 1:
+                screen.blit(heart_1, heart_1_rect)
+            case 0:
+                game_active = False
 
     display_score()
     gravity += 1
