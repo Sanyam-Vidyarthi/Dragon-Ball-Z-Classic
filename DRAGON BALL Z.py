@@ -135,8 +135,10 @@ while True:
                 if goku_rect.bottom >= 430:
                     gravity = -23
         elif event.type == pygame.KEYUP:
-            right = False
-            left = False
+            if event.key == pygame.K_RIGHT:
+                right = False
+            elif event.key == pygame.K_LEFT:
+                left = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
             if goku_rect.collidepoint(mouse_pos):
