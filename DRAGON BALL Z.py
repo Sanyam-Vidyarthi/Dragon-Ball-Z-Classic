@@ -32,7 +32,7 @@ def game_name():
 
 def start_command():
     start_command_1 = pygame.font.Font(None, 50)
-    start_command_rend = start_command_1.render('PRESS \'SPACE\' TO START', False, 'yellow')
+    start_command_rend = start_command_1.render('PRESS \'ANY KEY\' TO START', False, 'yellow')
     start_command_rect = start_command_rend.get_rect(center=(555, 530))
     screen.blit(start_command_rend, start_command_rect)
 
@@ -62,8 +62,8 @@ game_poster = pygame.image.load('pygame/game poster.png').convert_alpha()
 # random moves
 moves_lst_frieza = [2000, 3000, 1800, 2400]
 moves_lst_buu = [2000, 4000, 5500, 4800]
-moves_lst_goku_black = [9000, 5000, 7000]
-moves_lst_dragon_ball = [2400, 2000, 3000, 1900]
+moves_lst_goku_black = [4000, 3500, 2000]
+moves_lst_dragon_ball = [2400, 2000, 2700, 1900]
 moves_lst_zamasu = [5000, 4000, 6000, 3000]
 
 # health bar
@@ -94,15 +94,15 @@ font = pygame.font.Font(None, 30)
 pygame.mixer.init()
 pygame.mixer.music.load("game music.mp3")
 pygame.mixer.music.set_volume(15)
-pygame.mixer.music.play()
+pygame.mixer.music.play(4)
 
 # rect
 goku_rect = goku.get_rect(midbottom=(130, 430))
 frieza_rect = frieza.get_rect(midbottom=(1100, 435))
 goku_2_rect = goku_2.get_rect()
-goku_black_rect = goku_black.get_rect(midbottom=(8000, 435))
+goku_black_rect = goku_black.get_rect(midbottom=(4000, 435))
 kid_buu_rect = kid_buu.get_rect(midbottom=(5000, 438))
-zamasu_rect = zamasu.get_rect(midbottom=(6000, 550))
+zamasu_rect = zamasu.get_rect(midbottom=(3000, 435))
 
 # values
 gravity = 0
@@ -126,6 +126,10 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                pygame.quit()
+                exit()
         if event.type == pygame.KEYDOWN:
             if (event.key == pygame.K_RIGHT) or (event.key == pygame.K_d):
                 right = True
@@ -148,7 +152,7 @@ while True:
         # game start
         if start_true:
             start()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            if event.type == pygame.KEYDOWN:
                 game_active = True
                 check_state = True
                 start_true = False
@@ -162,13 +166,13 @@ while True:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 frieza_rect.left = 2200
                 kid_buu_rect.left = 6000
-                goku_black_rect.left = 7000
-                dragon_ball_rect.left = 8000
+                goku_black_rect.left = 3000
+                dragon_ball_rect.left = 4000
                 zamasu_rect.left = 70000
                 goku_rect.left = 130
                 real_score_1 = 0
                 game_active = True
-                pygame.mixer.music.play()
+                pygame.mixer.music.play(5)
                 hearts = 3
                 map_count = 0
     # game activation
@@ -185,8 +189,7 @@ while True:
         goku_black_random = random.choice(moves_lst_dragon_ball)
         dragon_ball_random = random.choice(moves_lst_dragon_ball)
         zamasu_random = random.choice(moves_lst_zamasu)
-        if not pygame.mixer.music.get_busy():
-            pygame.mixer.music.rewind()
+
 
         if real_score_1 == 11:
             map_count = 1
