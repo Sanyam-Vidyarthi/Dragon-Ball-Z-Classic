@@ -36,12 +36,12 @@ def start_command():
     start_command_rect = start_command_rend.get_rect(center=(555, 530))
     screen.blit(start_command_rend, start_command_rect)
 
+
 def start():
     screen.fill('blue')
     game_name()
     screen.blit(game_poster, game_poster_rect)
     start_command()
-
 
 
 pygame.init()
@@ -58,6 +58,9 @@ goku_black = pygame.image.load('pygame/goku black.png').convert_alpha()
 kid_buu = pygame.image.load('pygame/kid buu.png').convert_alpha()
 zamasu = pygame.image.load('pygame/zamasu.png').convert_alpha()
 game_poster = pygame.image.load('pygame/game poster.png').convert_alpha()
+kamehameha = pygame.image.load("pygame/kamehameha.png").convert_alpha()
+kamehameha_icon = pygame.image.load("pygame/kamehameha.png").convert_alpha()
+kamehameha_icon_reload = pygame.image.load("pygame/kamehameha icon black.png").convert()
 
 # random moves
 moves_lst_frieza = [2000, 3000, 1800, 2400]
@@ -79,7 +82,6 @@ planet_namek = pygame.image.load('pygame/planet namek.png').convert()
 planet_kai = pygame.image.load('pygame/kai planet.png').convert()
 future_trunks_city = pygame.image.load('pygame/future trunks city.png').convert()
 
-
 # dragon balls
 dragon_ball = pygame.image.load('pygame/dragon ball.png').convert_alpha()
 dragon_ball_rect = dragon_ball.get_rect(midbottom=(1100, 200))
@@ -88,7 +90,6 @@ namekian_dragon_ball_rect = namekian_dragon_ball.get_rect(midbottom=(1100, 200))
 super_dragon_ball = pygame.image.load('pygame/super dragon ball.png').convert_alpha()
 super_dragon_ball_rect = super_dragon_ball.get_rect(midbottom=(1100, 200))
 game_poster_rect = game_poster.get_rect(center=(555, 330))
-
 
 font = pygame.font.Font(None, 30)
 pygame.mixer.init()
@@ -103,6 +104,7 @@ goku_2_rect = goku_2.get_rect()
 goku_black_rect = goku_black.get_rect(midbottom=(4000, 435))
 kid_buu_rect = kid_buu.get_rect(midbottom=(5000, 438))
 zamasu_rect = zamasu.get_rect(midbottom=(3000, 435))
+kamehameha_rect = kamehameha.get_rect(center=(-100, 90))
 
 # values
 gravity = 0
@@ -117,9 +119,13 @@ map_count = 0
 start_true = True
 check_state = False
 check = 0
-right= False
+right = False
 left = False
+kamehameha_throw = False
 
+# timer
+check_button = 0
+button_pressed = 0
 
 while True:
     for event in pygame.event.get():
@@ -131,9 +137,18 @@ while True:
                 pygame.quit()
                 exit()
         if event.type == pygame.KEYDOWN:
-            if (event.key == pygame.K_RIGHT) or (event.key == pygame.K_d):
+            if (event.key == pygame.K_RCTRL) or (event.key == pygame.K_LCTRL):
+                goku_pos = goku_rect.center
+                if check_button - button_pressed >= 15000:
+                    button_pressed = pygame.time.get_ticks()
+                    kamehameha_pos = goku_pos
+                    kamehameha_rect.center = kamehameha_pos
+                    kamehameha_throw = True
+                else:
+                    kamehameha_throw = False
+            elif event.key == pygame.K_RIGHT:
                 right = True
-            elif (event.key == pygame.K_LEFT) or (event.key == pygame.K_a):
+            elif event.key == pygame.K_LEFT:
                 left = True
             elif event.key == pygame.K_SPACE:
                 if goku_rect.bottom >= 430:
@@ -170,6 +185,8 @@ while True:
                 dragon_ball_rect.left = 4000
                 zamasu_rect.left = 70000
                 goku_rect.left = 130
+                check_button = 0
+                button_pressed = 0
                 real_score_1 = 0
                 game_active = True
                 pygame.mixer.music.play(5)
@@ -178,18 +195,21 @@ while True:
     # game activation
 
     if game_active:
-        if right == True:
+        check_button = pygame.time.get_ticks()
+        if right:
             if goku_rect.right <= 1065:
                 goku_rect.right += 10
-        elif left == True:
+        elif left:
             if goku_rect.left >= 10:
                 goku_rect.left -= 10
+
+        if kamehameha_throw:
+            kamehameha_rect.left += 8
         frieza_random = random.choice(moves_lst_frieza)
         buu_random = random.choice(moves_lst_buu)
         goku_black_random = random.choice(moves_lst_dragon_ball)
         dragon_ball_random = random.choice(moves_lst_dragon_ball)
         zamasu_random = random.choice(moves_lst_zamasu)
-
 
         if real_score_1 == 11:
             map_count = 1
@@ -257,6 +277,31 @@ while True:
                 real_score_1 += score
                 score = 0
 
+        # attacks
+        if kamehameha_rect.colliderect(frieza_rect):
+            frieza_rect.left = frieza_random
+            kamehameha_rect.left = -100
+            kamehameha_throw = False
+
+        elif kamehameha_rect.colliderect(kid_buu_rect):
+            kid_buu_rect.left =  buu_random
+            kamehameha_rect.left = -100
+            kamehameha_throw = False
+
+        elif kamehameha_rect.colliderect(zamasu_rect):
+            zamasu_rect.left = zamasu_random
+            kamehameha_rect.left = -100
+            kamehameha_throw = False
+
+        elif kamehameha_rect.colliderect(goku_black_rect):
+            goku_black_rect.left = goku_black_random
+            kamehameha_rect.left = -100
+            kamehameha_throw = False
+
+        elif kamehameha_rect.left > 1300:
+            kamehameha_rect.left = -100
+            kamehameha_throw = False
+
         screen.blit(planet_namek, (0, 0))
         screen.blit(goku, goku_rect)
         screen.blit(frieza, frieza_rect)
@@ -264,6 +309,8 @@ while True:
 
         if map_count == 0:
             screen.blit(dragon_ball, dragon_ball_rect)
+            screen.blit(kamehameha, kamehameha_rect)
+            screen.blit(kamehameha_icon, (100, 10))
             dragon_ball_rect.left -= 9
             if dragon_ball_rect.right <= 0:
                 dragon_ball_rect.left = dragon_ball_random
@@ -272,6 +319,7 @@ while True:
             screen.blit(goku, goku_rect)
             screen.blit(kid_buu, kid_buu_rect)
             screen.blit(frieza, frieza_rect)
+            screen.blit(kamehameha, kamehameha_rect)
             screen.blit(text, (455, 40))
             screen.blit(namekian_dragon_ball, namekian_dragon_ball_rect)
             namekian_dragon_ball_rect.left -= 9
@@ -302,7 +350,6 @@ while True:
             if zamasu_rect.right <= 0:
                 zamasu_rect.left = zamasu_random
 
-
         match hearts:
             case 3:
                 screen.blit(heart_3, heart_3_rect)
@@ -321,6 +368,8 @@ while True:
     goku_rect.y += gravity
     if goku_rect.bottom >= 432:
         goku_rect.bottom = 430
+
+    print(f"{check_button}     {button_pressed}")
 
     pygame.display.update()
     clock.tick(30)
