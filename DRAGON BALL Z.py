@@ -307,10 +307,14 @@ while True:
         screen.blit(frieza, frieza_rect)
         screen.blit(text, (455, 40))
 
+
         if map_count == 0:
             screen.blit(dragon_ball, dragon_ball_rect)
             screen.blit(kamehameha, kamehameha_rect)
-            screen.blit(kamehameha_icon, (100, 10))
+            if not kamehameha_throw:
+                screen.blit(kamehameha_icon_reload, (100, 10))
+            elif kamehameha_throw:
+                screen.blit(kamehameha_icon, (100, 10))
             dragon_ball_rect.left -= 9
             if dragon_ball_rect.right <= 0:
                 dragon_ball_rect.left = dragon_ball_random
